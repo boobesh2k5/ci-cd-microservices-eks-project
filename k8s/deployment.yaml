@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cafe-web
+  labels:
+    app: cafe-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cafe-web
+  template:
+    metadata:
+      labels:
+        app: cafe-web
+    spec:
+      containers:
+        - name: cafe-web
+          image: 363267429195.dkr.ecr.eu-north-1.amazonaws.com/devopsproject/ci-cdpipelineautomation:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
