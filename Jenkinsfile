@@ -75,6 +75,20 @@ pipeline {
             }
         }
 
+        stage('Update Kubernetes Manifest') {
+            steps {
+                sh '''
+                    echo "Updating Kubernetes image tag..."
+
+                    sed -i "s|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" \
+                        k8s/deployment.yaml
+
+                    echo "Updated Kubernetes image:"
+                    grep "image:" k8s/deployment.yaml
+                '''
+            }
+        }
+
         stage('Verify EKS Access') {
             steps {
                 sh '''
@@ -91,6 +105,7 @@ pipeline {
     }
 
     post {
+
         always {
             sh '''
                 docker logout ${ECR_REGISTRY} || true
