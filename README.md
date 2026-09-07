@@ -190,7 +190,7 @@ Healthy
 ---
 👨‍💻 Author
 
-M Boobeshwaran
-Cloud & DevOps Engineer Aspirant
+M Boobeshwaran,
+An Cloud & DevOps Engineer Aspirant
 
 AWS • Jenkins • Docker • Kubernetes • EKS • ECR • Argo CD • SonarQube • Trivy • GitHub
