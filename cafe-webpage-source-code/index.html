@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chai & Chaska | Artisan Desi Café & Chai Bar (Bengaluru)</title>
+  <meta name="description" content="Authentic Indian cafe experience. Steaming Kulhad Masala Chai, Filter Kaapi, Bun Maska, Samosa Chaat & Desi Bites. Handcrafted with love." />
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- 100% Local Vendor Scripts (Zero External Downloads or Packages Required) -->
+  <script src="./vendor/tailwindcss.js"></script>
+  <script src="./vendor/react.production.min.js"></script>
+  <script src="./vendor/react-dom.production.min.js"></script>
+  <script src="./vendor/babel.min.js"></script>
+
+  <!-- Tailwind Custom Configuration -->
+  <script>
+    window.tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            chai: {
+              50: '#FDF8F3',
+              100: '#F7EADB',
+              200: '#EED3B7',
+              300: '#E1B48D',
+              400: '#D29260',
+              500: '#C17539',
+              600: '#A45928',
+              700: '#844220',
+              800: '#64301B',
+              900: '#3D1C0F',
+              950: '#251008',
+            },
+            terracotta: {
+              500: '#C2410C',
+              600: '#9A3412',
+              700: '#7C2D12',
+            },
+            saffron: {
+              400: '#FBBF24',
+              500: '#F59E0B',
+              600: '#D97706',
+            },
+            cardamom: {
+              600: '#059669',
+              700: '#047857',
+              800: '#065F46',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F7EADB;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #C17539;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #844220;
+    }
+
+    /* Subtle Steam Animation */
+    @keyframes steamFloat {
+      0% { transform: translateY(0) scaleX(1); opacity: 0.6; }
+      50% { transform: translateY(-8px) scaleX(1.15); opacity: 0.9; }
+      100% { transform: translateY(-16px) scaleX(1.3); opacity: 0; }
+    }
+    .steam-anim-1 { animation: steamFloat 2.4s ease-in-out infinite; }
+    .steam-anim-2 { animation: steamFloat 2.4s ease-in-out 0.8s infinite; }
+    .steam-anim-3 { animation: steamFloat 2.4s ease-in-out 1.6s infinite; }
+
+    /* Kulhad Glow */
+    .glow-amber {
+      box-shadow: 0 10px 30px -10px rgba(193, 117, 57, 0.35);
+    }
+  </style>
+</head>
+<body class="bg-[#FAF6F0] text-stone-800 antialiased selection:bg-amber-200 selection:text-amber-900 font-sans">
+  <!-- Root React Container -->
+  <div id="root"></div>
+
+  <!-- React Application Logic -->
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    // --- MENU DATABASE (All in INR ₹) ---
+    const MENU_ITEMS = [
+      {
+        id: 1,
+        name: "Kulhad Masala Chai",
+        tagline: "Slow-brewed with fresh adrak, green elaichi & secret 7-spice blend",
+        price: 49,
+        category: "chai-kaapi",
+        isVeg: true,
+        rating: 4.9,
+        reviewsCount: 340,
+        badge: "Bestseller",
+        image: "./images/bun_maska.jpg",
+        tags: ["Kadak", "Clay Mug", "Organic Milk"]
+      },
+      {
+        id: 2,
+        name: "Irani Bun Maska & Jam",
+        tagline: "Soft bakery pav slathered with homemade salted butter & mixed fruit jam",
+        price: 79,
+        category: "bun-toasts",
+        isVeg: true,
+        rating: 4.8,
+        reviewsCount: 280,
+        badge: "Classic",
+        image: "./images/bun_maska.jpg",
+        tags: ["Melt-in-mouth", "Amul Butter", "Mumbai Vibes"]
+      },
+      {
+        id: 3,
+        name: "South Indian Filter Kaapi",
+        tagline: "Traditional Chikmagalur dark roast served in brass davarah & tumbler with frothy foam",
+        price: 69,
+        category: "chai-kaapi",
+        isVeg: true,
+        rating: 5.0,
+        reviewsCount: 410,
+        badge: "Chef's Pick",
+        image: "./images/kaapi_cheesecake.jpg",
+        tags: ["85:15 Blend", "Brass Davarah", "Pure Kaapi"]
+      },
+      {
+        id: 4,
+        name: "Crispy Samosa Chaat Platter",
+        tagline: "Two smashed Punjabi samosas with spicy chole, sweet tamarind, mint chutney & sev",
+        price: 139,
+        category: "chaat-street",
+        isVeg: true,
+        rating: 4.9,
+        reviewsCount: 520,
+        badge: "Must Try",
+        image: "./images/samosa_chaat.jpg",
+        tags: ["Tangy", "Crunchy", "Clay Bowl"]
+      },
+      {
+        id: 5,
+        name: "Bombay Chilli Cheese Toast",
+        tagline: "Triple decker toast with spicy green peppers, processed cheddar & roasted cumin",
+        price: 129,
+        category: "bun-toasts",
+        isVeg: true,
+        rating: 4.7,
+        reviewsCount: 195,
+        badge: "Popular",
+        image: "./images/bun_maska.jpg",
+        tags: ["Crispy", "Cheesy", "Spicy"]
+      },
+      {
+        id: 6,
+        name: "Artisan Gulab Jamun Cheesecake",
+        tagline: "Creamy baked cardamom cheesecake with soaked warm gulab jamun core & pistachio rose petals",
+        price: 189,
+        category: "mithai-dessert",
+        isVeg: true,
+        rating: 4.95,
+        reviewsCount: 310,
+        badge: "House Special",
+        image: "./images/kaapi_cheesecake.jpg",
+        tags: ["Fusion", "Saffron Drizzle", "Decadent"]
+      },
+      {
+        id: 7,
+        name: "Ginger Lemon Grass Kadak Chai",
+        tagline: "Vibrant zesty chai simmered with pounded ginger and fresh homegrown lemongrass",
+        price: 59,
+        category: "chai-kaapi",
+        isVeg: true,
+        rating: 4.7,
+        reviewsCount: 142,
+        badge: "Immunity Booster",
+        image: "./images/bun_maska.jpg",
+        tags: ["Winter Kadak", "Soothing", "Pure Herbs"]
+      },
+      {
+        id: 8,
+        name: "Kashmiri Kahwa Royal",
+        tagline: "Green tea simmered with saffron strands, whole cinnamon, cardamom & slivered almonds",
+        price: 119,
+        category: "chai-kaapi",
+        isVeg: true,
+        rating: 4.85,
+        reviewsCount: 98,
+        badge: "Royal",
+        image: "./images/hero.jpg",
+        tags: ["Kesar", "Almond Crunch", "No Milk"]
+      },
+      {
+        id: 9,
+        name: "Vada Pav Sliders with Thecha (2 Pcs)",
+        tagline: "Golden batata vadas in mini buttered paos with fiery Kolhapuri green chilli thecha & dry garlic podi",
+        price: 99,
+        category: "chaat-street",
+        isVeg: true,
+        rating: 4.8,
+        reviewsCount: 380,
+        badge: "Spicy",
+        image: "./images/samosa_chaat.jpg",
+        tags: ["Mumbai Street", "Spicy Thecha", "Fried Chilli"]
+      },
+      {
+        id: 10,
+        name: "Paneer Tikka Charcoal Sandwich",
+        tagline: "Smoky tandoori paneer cubes, mint mayonnaise, onion rings pressed in sourdough bread",
+        price: 179,
+        category: "bun-toasts",
+        isVeg: true,
+        rating: 4.8,
+        reviewsCount: 220,
+        badge: "Hearty",
+        image: "./images/bun_maska.jpg",
+        tags: ["Tandoori Paneer", "Grilled", "Chutney Dip"]
+      },
+      {
+        id: 11,
+        name: "Pav Bhaji Fondue Bowl",
+        tagline: "Slow-simmered buttery spiced bhaji served fondue-style with bite-sized herbed butter pao skewers",
+        price: 199,
+        category: "chaska-meals",
+        isVeg: true,
+        rating: 4.9,
+        reviewsCount: 290,
+        badge: "Crowd Favorite",
+        image: "./images/samosa_chaat.jpg",
+        tags: ["Amul Butter", "Interactive Bowl", "Rich Gravy"]
+      },
+      {
+        id: 12,
+        name: "Alphonso Mango Cardamom Shrikhand",
+        tagline: "Hung curd whipped with Ratnagiri alphonso pulp, nutmeg and roasted dry fruit flakes",
+        price: 149,
+        category: "mithai-dessert",
+        isVeg: true,
+        rating: 4.85,
+        reviewsCount: 160,
+        badge: "Cooling",
+        image: "./images/kaapi_cheesecake.jpg",
+        tags: ["Seasonal", "Natural Sweet", "Probiotic"]
+      }
+    ];
+
+    const CATEGORIES = [
+      { id: "all", name: "Full Menu", icon: "✨" },
+      { id: "chai-kaapi", name: "Kadak Chai & Kaapi", icon: "☕" },
+      { id: "bun-toasts", name: "Bun Maska & Toasts", icon: "🍞" },
+      { id: "chaat-street", name: "Street Chaat & Bites", icon: "🥟" },
+      { id: "chaska-meals", name: "Chaska Bowls", icon: "🍛" },
+      { id: "mithai-dessert", name: "Mithai & Desserts", icon: "🍨" },
+    ];
+
+    // --- MAIN APP COMPONENT ---
+    function App() {
+      // States
+      const [activeCategory, setActiveCategory] = useState("all");
+      const [searchQuery, setSearchQuery] = useState("");
+      const [cart, setCart] = useState({});
+      const [isCartOpen, setIsCartOpen] = useState(false);
+      const [isReservationOpen, setIsReservationOpen] = useState(false);
+      const [isAwsModalOpen, setIsAwsModalOpen] = useState(false);
+      const [isCheckoutReceiptOpen, setIsCheckoutReceiptOpen] = useState(false);
+      const [latestOrder, setLatestOrder] = useState(null);
+      
+      // Toast notification state
+      const [toast, setToast] = useState({ show: false, message: "", type: "info" });
+      
+      // Coupon state
+      const [couponInput, setCouponInput] = useState("");
+      const [appliedDiscount, setAppliedDiscount] = useState(0);
+      const [couponError, setCouponError] = useState("");
+
+      // Reservation Form State
+      const [reserveForm, setReserveForm] = useState({
+        name: "",
+        phone: "",
+        guests: "2",
+        date: "2026-09-08",
+        time: "18:30",
+        seating: "Indoor AC Lounge",
+        notes: ""
+      });
+      const [reservationSuccess, setReservationSuccess] = useState(null);
+
+      // Custom Chai Lab State
+      const [customChai, setCustomChai] = useState({
+        base: "Kadak Assam CTC",
+        spices: ["Adrak (Ginger)", "Elaichi (Cardamom)"],
+        sweetness: "Desi Gur (Jaggery)",
+        milk: "Full Cream Milk",
+      });
+
+      // Show Toast Helper
+      const showToast = (message, type = "success") => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: "", type: "info" }), 3200);
+      };
+
+      // Cart Item Management
+      const addToCart = (item) => {
+        setCart(prev => ({
+          ...prev,
+          [item.id]: {
+            ...item,
+            quantity: (prev[item.id]?.quantity || 0) + 1
+          }
+        }));
+        showToast(`Added ${item.name} to your plate! 🫖`);
+      };
+
+      const removeFromCart = (itemId) => {
+        setCart(prev => {
+          const current = { ...prev };
+          if (current[itemId]?.quantity > 1) {
+            current[itemId].quantity -= 1;
+          } else {
+            delete current[itemId];
+          }
+          return current;
+        });
+      };
+
+      const deleteFromCart = (itemId) => {
+        setCart(prev => {
+          const current = { ...prev };
+          delete current[itemId];
+          return current;
+        });
+      };
+
+      const clearCart = () => {
+        setCart({});
+        setAppliedDiscount(0);
+        setCouponInput("");
+      };
+
+      // Calculations
+      const cartItems = Object.values(cart);
+      const totalItemsCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+      const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+      const gst = Math.round(subtotal * 0.05); // 5% Cafe GST
+      const deliveryOrPackaging = subtotal > 0 ? (subtotal >= 299 ? 0 : 15) : 0;
+      const discountAmount = Math.round((subtotal * appliedDiscount) / 100);
+      const grandTotal = Math.max(0, subtotal + gst + deliveryOrPackaging - discountAmount);
+
+      // Apply Coupon
+      const handleApplyCoupon = (e) => {
+        e.preventDefault();
+        const code = couponInput.trim().toUpperCase();
+        if (code === "DESICHAI") {
+          setAppliedDiscount(15);
+          setCouponError("");
+          showToast("Coupon 'DESICHAI' applied! 15% OFF! 🎉");
+        } else if (code === "AWSDEVOPS") {
+          setAppliedDiscount(20);
+          setCouponError("");
+          showToast("Special DevOps Discount: 20% OFF by M Boobeshwaran! 🚀");
+        } else {
+          setCouponError("Invalid code. Try 'DESICHAI' or 'AWSDEVOPS'");
+        }
+      };
+
+      // Handle Checkout
+      const handleCheckout = () => {
+        if (cartItems.length === 0) {
+          showToast("Your plate is empty! Add some delicious chai first.", "error");
+          return;
+        }
+        const orderData = {
+          orderId: "CC-" + Math.floor(100000 + Math.random() * 900000),
+          timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
+          items: cartItems,
+          subtotal,
+          gst,
+          discountAmount,
+          deliveryOrPackaging,
+          grandTotal,
+          tableOrTakeaway: "Dine-In Table #7"
+        };
+        setLatestOrder(orderData);
+        setIsCartOpen(false);
+        setIsCheckoutReceiptOpen(true);
+        clearCart();
+      };
+
+      // Handle Reservation Submit
+      const handleReserveSubmit = (e) => {
+        e.preventDefault();
+        if (!reserveForm.name || !reserveForm.phone) {
+          showToast("Please provide your name and contact number", "error");
+          return;
+        }
+        const refId = "RES-" + Math.floor(1000 + Math.random() * 9000);
+        setReservationSuccess({
+          ...reserveForm,
+          refId
+        });
+        showToast("Table reserved successfully! Awaiting your arrival.");
+      };
+
+      // Filtered Menu Items
+      const filteredItems = useMemo(() => {
+        return MENU_ITEMS.filter(item => {
+          const matchesCategory = activeCategory === "all" || item.category === activeCategory;
+          const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                item.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                item.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+          return matchesCategory && matchesSearch;
+        });
+      }, [activeCategory, searchQuery]);
+
+      // Add Custom Chai from Lab
+      const handleAddCustomChai = () => {
+        const customItem = {
+          id: 9990 + (Date.now() % 1000),
+          name: `Custom Kulhad: ${customChai.base}`,
+          tagline: `Infused with ${customChai.spices.join(", ")}, sweetened with ${customChai.sweetness} in ${customChai.milk}`,
+          price: 65,
+          category: "chai-kaapi",
+          isVeg: true,
+          rating: 5.0,
+          reviewsCount: 1,
+          badge: "Your Blend",
+          image: "./images/bun_maska.jpg",
+          tags: ["Custom Lab", "Fresh Kulhad"]
+        };
+        addToCart(customItem);
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col relative overflow-x-hidden">
+          
+          {/* TOAST NOTIFICATION */}
+          {toast.show && (
+            <div className="fixed top-6 right-6 z-50 bg-stone-900 text-amber-100 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-amber-500/40 transform transition-all duration-300 animate-bounce">
+              <span className="text-xl">☕</span>
+              <p className="text-sm font-semibold tracking-wide">{toast.message}</p>
+            </div>
+          )}
+
+          {/* TOP MARQUEE / ANNOUNCEMENT BAR */}
+          <div className="bg-gradient-to-r from-chai-800 via-terracotta-600 to-chai-900 text-amber-100 text-xs py-2 px-4 border-b border-amber-900/30">
+            <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span className="font-semibold text-amber-300">Live Cafe:</span>
+                <span>Open Now · Brewing till 11:00 PM IST · Indiranagar 100ft Rd, Bengaluru</span>
+              </div>
+              <div className="flex items-center gap-4 text-[11px] font-medium">
+                <span className="hidden md:inline text-amber-200">🫖 Daily Offer: Use code <strong className="text-white underline">DESICHAI</strong> for 15% OFF</span>
+                <button 
+                  onClick={() => setIsAwsModalOpen(true)}
+                  className="bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 px-2.5 py-0.5 rounded-full border border-amber-400/40 transition-colors flex items-center gap-1"
+                >
+                  <span>☁️ AWS DevOps Showcase</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* MAIN HEADER / NAVBAR */}
+          <header className="sticky top-0 z-40 bg-[#FAF6F0]/90 backdrop-blur-md border-b border-amber-200/60 transition-all shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+              
+              {/* Brand Logo */}
+              <a href="#" className="flex items-center gap-3 group">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-600 to-terracotta-600 p-0.5 shadow-md group-hover:scale-105 transition-transform flex items-center justify-center">
+                  <div className="w-full h-full bg-chai-900 rounded-[14px] flex items-center justify-center relative overflow-hidden">
+                    {/* Steam Micro Effect */}
+                    <div className="absolute -top-1 flex gap-0.5">
+                      <span className="w-1 h-3 bg-amber-200/60 rounded-full steam-anim-1"></span>
+                      <span className="w-1 h-4 bg-amber-200/70 rounded-full steam-anim-2"></span>
+                      <span className="w-1 h-3 bg-amber-200/60 rounded-full steam-anim-3"></span>
+                    </div>
+                    <span className="text-2xl pt-1">🫖</span>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-serif text-2xl font-black tracking-tight text-chai-950">CHAI & CHASKA</span>
+                    <span className="text-[10px] bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Desi</span>
+                  </div>
+                  <p className="text-[11px] text-chai-700 font-semibold tracking-wide">The Artisan Indian Café & Chai Bar</p>
+                </div>
+              </a>
+
+              {/* Desktop Nav Links */}
+              <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-stone-700">
+                <a href="#menu" className="hover:text-chai-700 transition-colors">Menu in ₹ INR</a>
+                <a href="#custom-chai" className="hover:text-chai-700 transition-colors">Chai Lab</a>
+                <a href="#experience" className="hover:text-chai-700 transition-colors">The Kulhad Ritual</a>
+                <a href="#reviews" className="hover:text-chai-700 transition-colors">Chai Stories</a>
+                <a href="#location" className="hover:text-chai-700 transition-colors">Visit Us</a>
+              </nav>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3">
+                {/* Table Booking Modal Trigger */}
+                <button
+                  id="book-table-nav-btn"
+                  onClick={() => setIsReservationOpen(true)}
+                  className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold bg-amber-100 hover:bg-amber-200 text-chai-900 border border-amber-300 transition-all shadow-sm active:scale-95"
+                >
+                  <span>📅</span>
+                  <span>Book Table</span>
+                </button>
+
+                {/* Cart Button */}
+                <button
+                  id="cart-toggle-btn"
+                  onClick={() => setIsCartOpen(true)}
+                  className="relative flex items-center gap-2.5 px-4 py-2.5 rounded-full text-xs font-bold bg-gradient-to-r from-chai-700 to-terracotta-600 hover:from-chai-800 hover:to-terracotta-700 text-white shadow-md hover:shadow-lg transition-all active:scale-95"
+                >
+                  <span className="text-base">🛍️</span>
+                  <span className="hidden sm:inline">My Plate</span>
+                  {totalItemsCount > 0 && (
+                    <span className="bg-amber-400 text-chai-950 px-2 py-0.5 rounded-full text-[11px] font-black animate-pulse">
+                      {totalItemsCount} · ₹{grandTotal}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+            </div>
+          </header>
+
+          {/* HERO SECTION */}
+          <section className="relative overflow-hidden pt-8 pb-16 lg:py-20 bg-gradient-to-b from-[#FAF6F0] via-amber-50/50 to-[#FAF6F0]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                {/* Left Column: Hero Content */}
+                <div className="lg:col-span-7 space-y-6">
+                  
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-300 text-chai-900 text-xs font-bold tracking-wide">
+                    <span>✨</span>
+                    <span>100% Pure A2 Dairy · Authentic Spices · Clay Baked</span>
+                  </div>
+
+                  <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-black text-chai-950 leading-[1.15]">
+                    Where Kadak Chai Meets <span className="text-transparent bg-clip-text bg-gradient-to-r from-terracotta-600 via-amber-600 to-chai-700 underline decoration-amber-300 decoration-wavy decoration-2">Desi Chaska</span>.
+                  </h1>
+
+                  <p className="text-stone-600 text-base sm:text-lg max-w-2xl leading-relaxed">
+                    Step into an earthen sanctuary of freshly roasted spices, frothy South Indian Kaapi, piping hot Irani Bun Maska, and crispy Samosa Chaat served in artisan terracotta kulhads.
+                  </p>
+
+                  {/* Highlights Grid */}
+                  <div className="grid grid-cols-3 gap-4 pt-2">
+                    <div className="bg-white/80 backdrop-blur rounded-2xl p-3.5 border border-amber-200/70 shadow-sm">
+                      <div className="text-2xl font-black text-chai-800">₹49</div>
+                      <div className="text-xs text-stone-500 font-medium">Chai Starting From</div>
+                    </div>
+                    <div className="bg-white/80 backdrop-blur rounded-2xl p-3.5 border border-amber-200/70 shadow-sm">
+                      <div className="text-2xl font-black text-chai-800">18+</div>
+                      <div className="text-xs text-stone-500 font-medium">Secret Spice Blends</div>
+                    </div>
+                    <div className="bg-white/80 backdrop-blur rounded-2xl p-3.5 border border-amber-200/70 shadow-sm">
+                      <div className="text-2xl font-black text-chai-800">4.9 ★</div>
+                      <div className="text-xs text-stone-500 font-medium">12,000+ Desi Foodies</div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap items-center gap-4 pt-4">
+                    <a
+                      href="#menu"
+                      className="px-7 py-3.5 rounded-full bg-gradient-to-r from-chai-800 to-terracotta-600 hover:from-chai-900 hover:to-terracotta-700 text-white font-bold text-sm shadow-xl hover:shadow-2xl transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
+                    >
+                      <span>Explore Menu (in ₹)</span>
+                      <span>→</span>
+                    </a>
+                    <button
+                      id="hero-book-table-btn"
+                      onClick={() => setIsReservationOpen(true)}
+                      className="px-7 py-3.5 rounded-full bg-white hover:bg-amber-50 text-chai-900 border-2 border-amber-300 font-bold text-sm shadow-md transition-all flex items-center gap-2"
+                    >
+                      <span>☕ Book A Cozy Table</span>
+                    </button>
+                  </div>
+
+                  {/* Trust Badges */}
+                  <div className="flex items-center gap-6 pt-3 text-xs font-semibold text-stone-500">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-emerald-600 text-base">✓</span> Pure Desi Ghee
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-emerald-600 text-base">✓</span> Free Fast Wi-Fi
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-emerald-600 text-base">✓</span> Zero Login Required
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Right Column: Hero Visual Showcase */}
+                <div className="lg:col-span-5 relative">
+                  <div className="relative mx-auto max-w-md lg:max-w-none">
+                    
+                    {/* Decorative Backdrop */}
+                    <div className="absolute -inset-4 bg-gradient-to-tr from-amber-400/30 to-terracotta-500/20 rounded-3xl blur-2xl -z-10"></div>
+                    
+                    {/* Main Hero Card with Real Cafe Photo */}
+                    <div className="relative rounded-3xl overflow-hidden border-4 border-white shadow-2xl bg-stone-900 group">
+                      <img 
+                        src="./images/hero.jpg" 
+                        alt="Chai & Chaska Indian Cafe Ambiance" 
+                        className="w-full h-[420px] object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent"></div>
+                      
+                      {/* Floating Badge */}
+                      <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-amber-100 shadow-xl flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl">☕</span>
+                          <div>
+                            <div className="font-bold text-chai-950 text-sm">Kulhad Masala Chai & Maska</div>
+                            <div className="text-xs text-stone-500">Traditional clay experience · Fresh batch</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-lg font-black text-terracotta-600">₹89</span>
+                          <span className="text-[10px] block text-stone-400 line-through">₹120</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Additional Floating Mini Card */}
+                    <div className="absolute -top-4 -left-6 bg-white rounded-2xl p-3 border border-amber-200 shadow-xl hidden sm:flex items-center gap-2.5 animate-pulse">
+                      <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-lg">
+                        🧈
+                      </div>
+                      <div className="text-xs">
+                        <p className="font-bold text-chai-950">Irani Bun Maska</p>
+                        <p className="text-emerald-600 font-semibold">Fresh From Oven</p>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </section>
+
+          {/* INTERACTIVE CHAI LAB ("Build Your Kulhad Chai") */}
+          <section id="custom-chai" className="py-14 bg-amber-900 text-amber-50 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#F59E0B_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              <div className="text-center max-w-3xl mx-auto mb-10">
+                <span className="text-xs font-black uppercase tracking-widest text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/30">
+                  Interactive Experience
+                </span>
+                <h2 className="font-serif text-3xl sm:text-4xl font-bold mt-3 text-white">
+                  The Desi Chai Lab: <span className="text-amber-400">Craft Your Kulhad</span>
+                </h2>
+                <p className="text-amber-200 text-sm mt-2">
+                  Customize every single drop. Pick your tea base, crush your favorite herbs, select your milk & jaggery, and add it directly to your plate!
+                </p>
+              </div>
+
+              <div className="bg-chai-950/70 border border-amber-500/30 rounded-3xl p-6 sm:p-8 backdrop-blur-md shadow-2xl max-w-4xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                  
+                  {/* Customizer Controls */}
+                  <div className="space-y-5">
+                    {/* 1. Base */}
+                    <div>
+                      <label className="text-xs font-bold text-amber-300 uppercase tracking-wider block mb-2">1. Choose Tea Leaf Base</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {["Kadak Assam CTC", "Nilgiri Orthodox", "Kashmiri Kahwa", "Darjeeling Blend"].map(base => (
+                          <button
+                            key={base}
+                            onClick={() => setCustomChai(prev => ({ ...prev, base }))}
+                            className={`text-xs py-2 px-3 rounded-xl font-semibold border transition-all text-left ${customChai.base === base ? "bg-amber-500 text-chai-950 border-amber-400 shadow-md font-bold" : "bg-chai-900/60 border-amber-900/50 text-amber-200 hover:bg-chai-900"}`}
+                          >
+                            {customChai.base === base ? "✓ " : ""}{base}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 2. Spices */}
+                    <div>
+                      <label className="text-xs font-bold text-amber-300 uppercase tracking-wider block mb-2">2. Fresh Hand-Crushed Spices</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {["Adrak (Ginger)", "Elaichi (Cardamom)", "Laung & Dalchini", "Lemongrass & Tulsi"].map(spice => {
+                          const isSelected = customChai.spices.includes(spice);
+                          return (
+                            <button
+                              key={spice}
+                              onClick={() => {
+                                setCustomChai(prev => {
+                                  const exists = prev.spices.includes(spice);
+                                  return {
+                                    ...prev,
+                                    spices: exists ? prev.spices.filter(s => s !== spice) : [...prev.spices, spice]
+                                  };
+                                });
+                              }}
+                              className={`text-xs py-2 px-3 rounded-xl font-semibold border transition-all text-left ${isSelected ? "bg-terracotta-500 text-white border-terracotta-400 font-bold" : "bg-chai-900/60 border-amber-900/50 text-amber-200 hover:bg-chai-900"}`}
+                            >
+                              {isSelected ? "✓ " : "+ "}{spice}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 3. Sweetener & Milk */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-bold text-amber-300 uppercase tracking-wider block mb-2">3. Sweetener</label>
+                        <select
+                          value={customChai.sweetness}
+                          onChange={(e) => setCustomChai(prev => ({ ...prev, sweetness: e.target.value }))}
+                          className="w-full bg-chai-900 border border-amber-700/60 text-amber-100 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-amber-400 focus:outline-none"
+                        >
+                          <option>Desi Gur (Jaggery)</option>
+                          <option>Raw Khandsari Sugar</option>
+                          <option>Organic Honey</option>
+                          <option>Zero Sugar / Phika</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-amber-300 uppercase tracking-wider block mb-2">4. Milk Type</label>
+                        <select
+                          value={customChai.milk}
+                          onChange={(e) => setCustomChai(prev => ({ ...prev, milk: e.target.value }))}
+                          className="w-full bg-chai-900 border border-amber-700/60 text-amber-100 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-amber-400 focus:outline-none"
+                        >
+                          <option>Full Cream Milk</option>
+                          <option>A2 Desi Cow Milk</option>
+                          <option>Creamy Oat Milk</option>
+                          <option>Water Only (Sulaimani)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Live Kulhad Preview */}
+                  <div className="bg-gradient-to-br from-chai-900 to-chai-950 p-6 rounded-2xl border border-amber-500/40 text-center space-y-4">
+                    <div className="text-6xl mx-auto drop-shadow-lg">🫖</div>
+                    <h3 className="font-serif text-xl font-bold text-amber-200">
+                      {customChai.base}
+                    </h3>
+                    <div className="text-xs text-amber-100/80 space-y-1">
+                      <p>🌿 <strong className="text-amber-300">Spices:</strong> {customChai.spices.length > 0 ? customChai.spices.join(", ") : "Classic Pure"}</p>
+                      <p>🍯 <strong className="text-amber-300">Sweetener:</strong> {customChai.sweetness}</p>
+                      <p>🥛 <strong className="text-amber-300">Milk:</strong> {customChai.milk}</p>
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-between border-t border-amber-800/60">
+                      <div className="text-left">
+                        <span className="text-xs text-amber-400 font-medium block">Custom Crafted Price</span>
+                        <span className="text-2xl font-black text-amber-300">₹65</span>
+                      </div>
+                      <button
+                        id="add-custom-chai-btn"
+                        onClick={handleAddCustomChai}
+                        className="px-5 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-chai-950 font-black text-xs rounded-full shadow-lg transition-transform active:scale-95"
+                      >
+                        Add Custom Chai to Plate +
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* MENU SECTION */}
+          <section id="menu" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            {/* Header & Search */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+              <div>
+                <span className="text-xs font-bold text-terracotta-600 uppercase tracking-widest bg-orange-100 px-3 py-1 rounded-full border border-orange-200">
+                  Desi Artisan Delicacies
+                </span>
+                <h2 className="font-serif text-3xl sm:text-4xl font-extrabold text-chai-950 mt-2">
+                  Explore Our Menu <span className="text-terracotta-600">(in ₹ INR)</span>
+                </h2>
+                <p className="text-stone-500 text-sm mt-1">All delicacies crafted with genuine ingredients and fresh spice grinds.</p>
+              </div>
+
+              {/* Search Bar */}
+              <div className="w-full md:w-72 relative">
+                <input
+                  id="menu-search-input"
+                  type="text"
+                  placeholder="Search chai, samosa, bun maska..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white border border-amber-200 rounded-full py-2.5 pl-10 pr-4 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none shadow-sm"
+                />
+                <span className="absolute left-3.5 top-3 text-stone-400 text-xs">🔍</span>
+                {searchQuery && (
+                  <button 
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3.5 top-2.5 text-stone-400 hover:text-stone-600 text-xs font-bold"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-2.5 overflow-x-auto pb-4 mb-8 no-scrollbar">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  id={`cat-btn-${cat.id}`}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    activeCategory === cat.id 
+                      ? "bg-chai-800 text-white shadow-md scale-105" 
+                      : "bg-white text-stone-600 hover:bg-amber-50 border border-amber-200/80"
+                  }`}
+                >
+                  <span>{cat.icon}</span>
+                  <span>{cat.name}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Menu Items Grid */}
+            {filteredItems.length === 0 ? (
+              <div className="text-center py-16 bg-white rounded-3xl border border-amber-200/70 p-8">
+                <span className="text-4xl">🔍</span>
+                <h3 className="font-serif text-xl font-bold text-chai-900 mt-2">No delicacies found</h3>
+                <p className="text-xs text-stone-500 mt-1">Try clearing your search query or selecting "Full Menu"</p>
+                <button
+                  onClick={() => { setActiveCategory("all"); setSearchQuery(""); }}
+                  className="mt-4 px-4 py-2 rounded-full bg-chai-800 text-white text-xs font-bold"
+                >
+                  Reset Menu Filter
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredItems.map(item => {
+                  const inCartQty = cart[item.id]?.quantity || 0;
+                  return (
+                    <div 
+                      key={item.id}
+                      className="bg-white rounded-3xl border border-amber-200/70 overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-400 transition-all flex flex-col group transform hover:-translate-y-1"
+                    >
+                      {/* Image Thumbnail & Badges */}
+                      <div className="relative h-48 overflow-hidden bg-stone-100">
+                        <img 
+                          src={item.image} 
+                          alt={item.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        />
+                        <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                          {/* Indian Food Veg Indicator (Green square with green dot) */}
+                          <div className="w-5 h-5 bg-white rounded border-2 border-emerald-600 flex items-center justify-center shadow">
+                            <div className="w-2.5 h-2.5 bg-emerald-600 rounded-full"></div>
+                          </div>
+                          <span className="bg-stone-900/85 text-amber-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full backdrop-blur-sm">
+                            {item.badge}
+                          </span>
+                        </div>
+                        <div className="absolute bottom-2.5 right-3 bg-white/90 backdrop-blur-sm text-stone-800 text-xs font-bold px-2 py-0.5 rounded-full shadow flex items-center gap-1">
+                          <span className="text-amber-500">★</span>
+                          <span>{item.rating}</span>
+                          <span className="text-[10px] text-stone-400">({item.reviewsCount})</span>
+                        </div>
+                      </div>
+
+                      {/* Content Body */}
+                      <div className="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                          <h3 className="font-serif text-lg font-bold text-chai-950 group-hover:text-terracotta-600 transition-colors">
+                            {item.name}
+                          </h3>
+                          <p className="text-stone-500 text-xs mt-1.5 leading-relaxed">
+                            {item.tagline}
+                          </p>
+
+                          {/* Tags */}
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {item.tags.map((t, idx) => (
+                              <span key={idx} className="bg-amber-50 text-chai-800 text-[10px] font-medium px-2 py-0.5 rounded border border-amber-200/50">
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Price & Add to Plate Controls */}
+                        <div className="pt-4 mt-4 border-t border-stone-100 flex items-center justify-between">
+                          <div>
+                            <span className="text-xs text-stone-400 font-semibold block">Price (INR)</span>
+                            <span className="text-xl font-black text-chai-950">₹{item.price}</span>
+                          </div>
+
+                          {inCartQty === 0 ? (
+                            <button
+                              id={`add-btn-${item.id}`}
+                              onClick={() => addToCart(item)}
+                              className="px-4 py-2 rounded-full bg-chai-800 hover:bg-chai-900 text-amber-50 font-bold text-xs shadow-md transition-all active:scale-95 flex items-center gap-1.5"
+                            >
+                              <span>+</span>
+                              <span>Add to Plate</span>
+                            </button>
+                          ) : (
+                            <div className="flex items-center gap-2 bg-amber-100 rounded-full px-2 py-1 border border-amber-300">
+                              <button
+                                onClick={() => removeFromCart(item.id)}
+                                className="w-6 h-6 rounded-full bg-white text-chai-950 font-bold text-xs flex items-center justify-center hover:bg-amber-200"
+                              >
+                                -
+                              </button>
+                              <span className="text-xs font-black text-chai-950 w-4 text-center">{inCartQty}</span>
+                              <button
+                                onClick={() => addToCart(item)}
+                                className="w-6 h-6 rounded-full bg-chai-800 text-white font-bold text-xs flex items-center justify-center hover:bg-chai-900"
+                              >
+                                +
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+          </section>
+
+          {/* THE KULHAD EXPERIENCE SECTION */}
+          <section id="experience" className="py-16 bg-[#F3ECE0] border-y border-amber-200/70">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center max-w-2xl mx-auto mb-12">
+                <span className="text-xs font-bold text-terracotta-600 uppercase tracking-widest">Heritage Craft</span>
+                <h2 className="font-serif text-3xl font-extrabold text-chai-950 mt-1">Why Chai Tastes Better in a Kulhad</h2>
+                <p className="text-stone-600 text-xs mt-2">
+                  Centuries before single-use paper cups, India perfected the art of drinking chai in unglazed clay pottery.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-white rounded-3xl p-6 border border-amber-200/80 shadow-sm text-center">
+                  <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-100 flex items-center justify-center text-2xl mb-4">
+                    🏺
+                  </div>
+                  <h3 className="font-serif text-lg font-bold text-chai-900">Earthy Mineral Aroma</h3>
+                  <p className="text-xs text-stone-500 mt-2 leading-relaxed">
+                    Unglazed terracotta porous walls absorb excess moisture and infuse the brew with a distinct wet-earth petrichor (mitti ki khushboo).
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-3xl p-6 border border-amber-200/80 shadow-sm text-center">
+                  <div className="w-14 h-14 mx-auto rounded-2xl bg-orange-100 flex items-center justify-center text-2xl mb-4">
+                    🌿
+                  </div>
+                  <h3 className="font-serif text-lg font-bold text-chai-900">100% Eco-Friendly</h3>
+                  <p className="text-xs text-stone-500 mt-2 leading-relaxed">
+                    Zero plastic or wax coating. Our kulhads are sculpted by indigenous potters, supporting local rural craft communities.
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-3xl p-6 border border-amber-200/80 shadow-sm text-center">
+                  <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-100 flex items-center justify-center text-2xl mb-4">
+                    ⚡
+                  </div>
+                  <h3 className="font-serif text-lg font-bold text-chai-900">Thermal Retaining</h3>
+                  <p className="text-xs text-stone-500 mt-2 leading-relaxed">
+                    Natural clay holds gentle warmth without burning your hands, ensuring your Kadak Chai stays steaming hot till the very last sip.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* TESTIMONIALS / CHAI STORIES */}
+          <section id="reviews" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="text-xs font-bold text-terracotta-600 uppercase tracking-widest">Love from Desi Foodies</span>
+              <h2 className="font-serif text-3xl font-extrabold text-chai-950 mt-1">What Our Regulars Say</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-3xl p-6 border border-amber-200/80 shadow-sm flex flex-col justify-between">
+                <div>
+                  <div className="text-amber-500 text-sm mb-2">★★★★★</div>
+                  <p className="text-xs text-stone-600 italic leading-relaxed">
+                    "The Bun Maska and Kulhad Ginger Elaichi chai here are absolute heaven. I bring my laptop and spend entire Saturday mornings working here. Free Wi-Fi and awesome playlists!"
+                  </p>
+                </div>
+                <div className="mt-4 pt-4 border-t border-stone-100 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-chai-100 font-bold text-xs text-chai-800 flex items-center justify-center">PS</div>
+                  <div>
+                    <p className="text-xs font-bold text-stone-900">Priya Sharma</p>
+                    <p className="text-[10px] text-stone-400">Software Engineer, Bangalore</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 border border-amber-200/80 shadow-sm flex flex-col justify-between">
+                <div>
+                  <div className="text-amber-500 text-sm mb-2">★★★★★</div>
+                  <p className="text-xs text-stone-600 italic leading-relaxed">
+                    "Authentic South Indian Filter Kaapi in a real brass tumbler! The aroma immediately took me back to Matunga and Mylapore. And the Gulab Jamun cheesecake is a masterpiece."
+                  </p>
+                </div>
+                <div className="mt-4 pt-4 border-t border-stone-100 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-amber-100 font-bold text-xs text-amber-800 flex items-center justify-center">AI</div>
+                  <div>
+                    <p className="text-xs font-bold text-stone-900">Ananya Iyer</p>
+                    <p className="text-[10px] text-stone-400">Coffee Enthusiast</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 border border-amber-200/80 shadow-sm flex flex-col justify-between">
+                <div>
+                  <div className="text-amber-500 text-sm mb-2">★★★★★</div>
+                  <p className="text-xs text-stone-600 italic leading-relaxed">
+                    "Samosa Chaat with authentic tamarind glaze! Best evening hangout with friends. All pricing in INR is super reasonable and no annoying app signups required."
+                  </p>
+                </div>
+                <div className="mt-4 pt-4 border-t border-stone-100 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-emerald-100 font-bold text-xs text-emerald-800 flex items-center justify-center">RV</div>
+                  <div>
+                    <p className="text-xs font-bold text-stone-900">Rohan Verma</p>
+                    <p className="text-[10px] text-stone-400">Architect & Food Blogger</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* CAFE LOCATION & VISIT US SECTION */}
+          <section id="location" className="py-14 bg-stone-900 text-amber-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                <div className="space-y-4">
+                  <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Drop by For A Cup</span>
+                  <h2 className="font-serif text-3xl font-extrabold text-white">Find Us In Indiranagar</h2>
+                  <p className="text-xs text-stone-300 leading-relaxed">
+                    Located in the heart of Bengaluru's food capital, nestled between lush gulmohar trees and serene cafe patios.
+                  </p>
+                  <div className="space-y-2 text-xs text-stone-300 pt-2">
+                    <p>📍 <strong className="text-white">Address:</strong> #428, 100 Feet Road, Near 12th Main Junction, Indiranagar, Bengaluru, Karnataka 560038</p>
+                    <p>⏰ <strong className="text-white">Timings:</strong> Monday to Sunday · 7:30 AM to 11:30 PM</p>
+                    <p>📞 <strong className="text-white">Direct Phone:</strong> +91 98765 43210 / 080-4567890</p>
+                  </div>
+                  <div className="flex gap-3 pt-3">
+                    <button
+                      onClick={() => showToast("Opening Google Maps directions... 🗺️")}
+                      className="px-5 py-2.5 rounded-full bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs"
+                    >
+                      Get Directions on Maps
+                    </button>
+                    <button
+                      onClick={() => setIsReservationOpen(true)}
+                      className="px-5 py-2.5 rounded-full bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs border border-stone-700"
+                    >
+                      Reserve Table
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-stone-800/80 p-6 rounded-3xl border border-stone-700 space-y-4">
+                  <h3 className="font-bold text-amber-300 text-sm">Quick Inquiries & Bulk Orders</h3>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="p-3 rounded-2xl bg-stone-900 border border-stone-800">
+                      <p className="font-bold text-white">Chai Flasks Delivery</p>
+                      <p className="text-stone-400 text-[11px] mt-1">Order 1L / 2L vacuum flasks for team meetings.</p>
+                    </div>
+                    <div className="p-3 rounded-2xl bg-stone-900 border border-stone-800">
+                      <p className="font-bold text-white">Private Chai Parties</p>
+                      <p className="text-stone-400 text-[11px] mt-1">Book our rooftop garden for intimate gatherings.</p>
+                    </div>
+                  </div>
+                  <div className="p-3.5 bg-amber-400/10 rounded-2xl border border-amber-400/30 text-[11px] text-amber-200">
+                    💡 <strong>DevOps Fast Delivery:</strong> Hosted on cloud-native static architecture for blistering sub-second response times worldwide!
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* DEDICATED AWS DEVOPS ENGINEER SHOWCASE & COPYRIGHT BANNER */}
+          <section className="bg-gradient-to-r from-stone-950 via-chai-950 to-stone-950 text-white py-12 border-t border-amber-900/50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="bg-stone-900/90 rounded-3xl p-6 sm:p-8 border border-amber-500/30 shadow-2xl relative overflow-hidden">
+                
+                {/* Subtle AWS Glow in background */}
+                <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl -z-10"></div>
+                
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+                  
+                  {/* Left: Creator Attribution */}
+                  <div className="space-y-3 text-center lg:text-left">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-bold">
+                      <span>☁️</span>
+                      <span>Cloud Architecture & DevOps Spotlight</span>
+                    </div>
+
+                    <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white">
+                      Designed & Developed with Passion
+                    </h3>
+
+                    {/* Exact User Copyright Requirement */}
+                    <div className="p-4 rounded-2xl bg-stone-950/80 border border-amber-500/40 text-amber-100">
+                      <p className="text-base sm:text-lg font-bold">
+                        Made with ❤️ by <span className="text-amber-400 font-extrabold">M Boobeshwaran</span>, an aspiring AWS DevOps engineer
+                      </p>
+                      <p className="text-xs text-stone-400 mt-1">
+                        High-performance responsive single-page web app built with React, Tailwind CSS, modern HTML5, and cloud-first DevOps deployment practices.
+                      </p>
+                    </div>
+
+                    {/* DevOps Skill Badges */}
+                    <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 pt-1">
+                      {["AWS S3 & CloudFront", "Docker Containers", "Terraform IaC", "GitHub Actions CI/CD", "Linux & Bash", "AWS EC2", "Kubernetes"].map(skill => (
+                        <span key={skill} className="bg-stone-800 text-amber-300 text-[11px] font-semibold px-3 py-1 rounded-full border border-stone-700">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right: Interactive Cloud Architecture View Button */}
+                  <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
+                    <button
+                      id="view-aws-details-btn"
+                      onClick={() => setIsAwsModalOpen(true)}
+                      className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-terracotta-500 hover:from-amber-400 hover:to-terracotta-400 text-stone-950 font-black text-xs shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      <span>🚀</span>
+                      <span>View AWS Architecture</span>
+                    </button>
+                    <a
+                      href="https://aws.amazon.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-6 py-3.5 rounded-2xl bg-stone-800 hover:bg-stone-700 text-amber-200 border border-stone-700 font-bold text-xs text-center transition-colors"
+                    >
+                      AWS Cloud Native
+                    </a>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+          </section>
+
+          {/* FOOTER */}
+          <footer className="bg-stone-950 text-stone-400 text-xs py-8 border-t border-stone-900">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🫖</span>
+                <span className="font-bold text-white">Chai & Chaska</span>
+                <span>· © 2026. All rights reserved.</span>
+              </div>
+              <div className="text-center sm:text-right text-[11px]">
+                <span>Crafted by <strong>M Boobeshwaran</strong> (Aspiring AWS DevOps Engineer)</span>
+              </div>
+            </div>
+          </footer>
+
+          {/* FLOATING ACTION BUTTON (CART & TABLE) */}
+          <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
+            {totalItemsCount > 0 && (
+              <button
+                id="floating-cart-btn"
+                onClick={() => setIsCartOpen(true)}
+                className="bg-gradient-to-r from-chai-700 to-terracotta-600 hover:from-chai-800 hover:to-terracotta-700 text-white p-4 rounded-full shadow-2xl flex items-center justify-center relative transform hover:scale-110 active:scale-95 transition-all border-2 border-amber-300"
+              >
+                <span className="text-xl">🛍️</span>
+                <span className="absolute -top-2 -right-2 bg-amber-400 text-stone-950 text-xs font-black w-6 h-6 rounded-full flex items-center justify-center shadow">
+                  {totalItemsCount}
+                </span>
+              </button>
+            )}
+          </div>
+
+          {/* ======================================================== */}
+          {/* MODAL 1: CART / ORDER DRAWER */}
+          {/* ======================================================== */}
+          {isCartOpen && (
+            <div className="fixed inset-0 z-50 overflow-hidden">
+              <div 
+                className="absolute inset-0 bg-stone-950/60 backdrop-blur-sm transition-opacity"
+                onClick={() => setIsCartOpen(false)}
+              ></div>
+
+              <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+                <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+                  
+                  {/* Drawer Header */}
+                  <div className="p-5 bg-[#FAF6F0] border-b border-amber-200 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">🛍️</span>
+                      <div>
+                        <h2 className="font-serif text-lg font-bold text-chai-950">Your Desi Plate</h2>
+                        <p className="text-[11px] text-stone-500">{totalItemsCount} delicious items selected</p>
+                      </div>
+                    </div>
+                    <button
+                      id="close-cart-btn"
+                      onClick={() => setIsCartOpen(false)}
+                      className="w-8 h-8 rounded-full bg-amber-100 hover:bg-amber-200 text-chai-900 flex items-center justify-center font-bold text-sm"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Drawer Body: Item List */}
+                  <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                    {cartItems.length === 0 ? (
+                      <div className="text-center py-16 text-stone-400">
+                        <span className="text-5xl block mb-2">🫖</span>
+                        <p className="font-bold text-sm text-stone-700">Your plate is currently empty!</p>
+                        <p className="text-xs mt-1">Explore our menu and add your favorite Chai or Bun Maska.</p>
+                        <button
+                          onClick={() => setIsCartOpen(false)}
+                          className="mt-5 px-5 py-2.5 rounded-full bg-chai-800 text-white text-xs font-bold"
+                        >
+                          Browse Delicacies
+                        </button>
+                      </div>
+                    ) : (
+                      cartItems.map(item => (
+                        <div key={item.id} className="flex items-center justify-between p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200/60">
+                          <div className="flex-1 pr-3">
+                            <h4 className="font-bold text-xs text-chai-950">{item.name}</h4>
+                            <span className="text-xs font-black text-chai-800">₹{item.price} each</span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center bg-white rounded-full border border-amber-300 px-1.5 py-0.5">
+                              <button
+                                onClick={() => removeFromCart(item.id)}
+                                className="w-5 h-5 rounded-full text-chai-900 font-bold text-xs flex items-center justify-center hover:bg-amber-100"
+                              >
+                                -
+                              </button>
+                              <span className="text-xs font-black px-2 text-chai-950">{item.quantity}</span>
+                              <button
+                                onClick={() => addToCart(item)}
+                                className="w-5 h-5 rounded-full bg-chai-800 text-white font-bold text-xs flex items-center justify-center hover:bg-chai-900"
+                              >
+                                +
+                              </button>
+                            </div>
+                            <button
+                              onClick={() => deleteFromCart(item.id)}
+                              className="text-stone-400 hover:text-red-600 p-1 text-xs"
+                              title="Remove item"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+
+                    {/* Coupon Promo Box */}
+                    {cartItems.length > 0 && (
+                      <form onSubmit={handleApplyCoupon} className="pt-2">
+                        <label className="text-[11px] font-bold text-stone-600 block mb-1">Apply Discount Voucher</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="e.g. DESICHAI or AWSDEVOPS"
+                            value={couponInput}
+                            onChange={(e) => setCouponInput(e.target.value)}
+                            className="flex-1 bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs uppercase font-bold focus:outline-none focus:ring-2 focus:ring-amber-500"
+                          />
+                          <button
+                            type="submit"
+                            className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-amber-200 rounded-xl text-xs font-bold"
+                          >
+                            Apply
+                          </button>
+                        </div>
+                        {couponError && <p className="text-[10px] text-red-600 mt-1">{couponError}</p>}
+                        {appliedDiscount > 0 && (
+                          <p className="text-[11px] text-emerald-700 font-bold mt-1">
+                            ✓ {appliedDiscount}% Discount applied successfully!
+                          </p>
+                        )}
+                      </form>
+                    )}
+                  </div>
+
+                  {/* Drawer Footer: Bill Summary */}
+                  {cartItems.length > 0 && (
+                    <div className="p-5 bg-[#FAF6F0] border-t border-amber-200 space-y-3">
+                      <div className="space-y-1.5 text-xs text-stone-600">
+                        <div className="flex justify-between">
+                          <span>Items Subtotal</span>
+                          <span className="font-semibold text-stone-800">₹{subtotal}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Cafe GST (5%)</span>
+                          <span className="font-semibold text-stone-800">₹{gst}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Packaging / Clay Fee</span>
+                          <span className="font-semibold text-stone-800">
+                            {deliveryOrPackaging === 0 ? <span className="text-emerald-600">FREE</span> : `₹${deliveryOrPackaging}`}
+                          </span>
+                        </div>
+                        {appliedDiscount > 0 && (
+                          <div className="flex justify-between text-emerald-700 font-bold">
+                            <span>Discount ({appliedDiscount}%)</span>
+                            <span>-₹{discountAmount}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between pt-2 border-t border-amber-200 text-sm font-black text-chai-950">
+                          <span>To Pay (in INR)</span>
+                          <span className="text-lg text-terracotta-600">₹{grandTotal}</span>
+                        </div>
+                      </div>
+
+                      <button
+                        id="checkout-proceed-btn"
+                        onClick={handleCheckout}
+                        className="w-full py-3.5 rounded-full bg-gradient-to-r from-chai-800 to-terracotta-600 hover:from-chai-900 hover:to-terracotta-700 text-white font-black text-xs shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+                      >
+                        <span>Place Order & Generate KOT Receipt</span>
+                        <span>→</span>
+                      </button>
+
+                      <p className="text-[10px] text-center text-stone-400">
+                        Instant digital KOT bill generation · No sign-in required
+                      </p>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ======================================================== */}
+          {/* MODAL 2: TABLE RESERVATION MODAL */}
+          {/* ======================================================== */}
+          {isReservationOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/70 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-amber-200 relative overflow-hidden">
+                
+                <button
+                  id="close-reserve-btn"
+                  onClick={() => { setIsReservationOpen(false); setReservationSuccess(null); }}
+                  className="absolute top-5 right-5 w-8 h-8 rounded-full bg-amber-100 hover:bg-amber-200 text-stone-800 flex items-center justify-center font-bold text-xs"
+                >
+                  ✕
+                </button>
+
+                {reservationSuccess ? (
+                  <div className="text-center py-6 space-y-4">
+                    <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 text-emerald-600 text-3xl flex items-center justify-center">
+                      ✓
+                    </div>
+                    <h3 className="font-serif text-2xl font-bold text-chai-950">Table Confirmed!</h3>
+                    <p className="text-xs text-stone-500">
+                      We have reserved your table at Chai & Chaska, Indiranagar.
+                    </p>
+
+                    <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 text-left text-xs space-y-1.5">
+                      <p>🎫 <strong className="text-chai-900">Booking Ref:</strong> {reservationSuccess.refId}</p>
+                      <p>👤 <strong className="text-chai-900">Guest Name:</strong> {reservationSuccess.name}</p>
+                      <p>👥 <strong className="text-chai-900">Party Size:</strong> {reservationSuccess.guests} Guests</p>
+                      <p>📅 <strong className="text-chai-900">Date & Time:</strong> {reservationSuccess.date} at {reservationSuccess.time}</p>
+                      <p>📍 <strong className="text-chai-900">Section:</strong> {reservationSuccess.seating}</p>
+                    </div>
+
+                    <button
+                      onClick={() => { setIsReservationOpen(false); setReservationSuccess(null); }}
+                      className="px-6 py-2.5 rounded-full bg-chai-800 text-white font-bold text-xs"
+                    >
+                      Done & Return
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="mb-6">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-terracotta-600 bg-orange-100 px-2.5 py-0.5 rounded-full">
+                        Instant Confirmation
+                      </span>
+                      <h3 className="font-serif text-2xl font-bold text-chai-950 mt-1">
+                        Book a Table at Chai & Chaska
+                      </h3>
+                      <p className="text-xs text-stone-500">No advance payment required. Just walk in and enjoy!</p>
+                    </div>
+
+                    <form onSubmit={handleReserveSubmit} className="space-y-4 text-xs">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="font-bold text-stone-700 block mb-1">Your Full Name</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. M Boobeshwaran"
+                            value={reserveForm.name}
+                            onChange={(e) => setReserveForm(prev => ({ ...prev, name: e.target.value }))}
+                            className="w-full bg-stone-50 border border-amber-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-stone-700 block mb-1">Mobile (+91)</label>
+                          <input
+                            type="tel"
+                            required
+                            placeholder="9876543210"
+                            value={reserveForm.phone}
+                            onChange={(e) => setReserveForm(prev => ({ ...prev, phone: e.target.value }))}
+                            className="w-full bg-stone-50 border border-amber-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="font-bold text-stone-700 block mb-1">Guests</label>
+                          <select
+                            value={reserveForm.guests}
+                            onChange={(e) => setReserveForm(prev => ({ ...prev, guests: e.target.value }))}
+                            className="w-full bg-stone-50 border border-amber-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          >
+                            <option value="1">1 Person</option>
+                            <option value="2">2 Guests</option>
+                            <option value="3">3 Guests</option>
+                            <option value="4">4 Guests</option>
+                            <option value="6">6 Guests (Party)</option>
+                            <option value="8+">8+ Large Group</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="font-bold text-stone-700 block mb-1">Date</label>
+                          <input
+                            type="date"
+                            value={reserveForm.date}
+                            onChange={(e) => setReserveForm(prev => ({ ...prev, date: e.target.value }))}
+                            className="w-full bg-stone-50 border border-amber-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-stone-700 block mb-1">Time Slot</label>
+                          <select
+                            value={reserveForm.time}
+                            onChange={(e) => setReserveForm(prev => ({ ...prev, time: e.target.value }))}
+                            className="w-full bg-stone-50 border border-amber-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          >
+                            <option>09:00 AM (Breakfast)</option>
+                            <option>11:30 AM (Chai Break)</option>
+                            <option>04:30 PM (Evening Chaat)</option>
+                            <option>06:30 PM (Sunset Kadak)</option>
+                            <option>08:30 PM (Dinner & Dessert)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-stone-700 block mb-1">Seating Section Preference</label>
+                        <select
+                          value={reserveForm.seating}
+                          onChange={(e) => setReserveForm(prev => ({ ...prev, seating: e.target.value }))}
+                          className="w-full bg-stone-50 border border-amber-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        >
+                          <option>Indoor Cozy AC Lounge</option>
+                          <option>Outdoor Verandah (Chai Tapri Style)</option>
+                          <option>Quiet Remote Work Corner (Charging Outlets)</option>
+                          <option>Rooftop Garden Seating</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-stone-700 block mb-1">Special Occasion / Note (Optional)</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Birthday celebration, High chair needed"
+                          value={reserveForm.notes}
+                          onChange={(e) => setReserveForm(prev => ({ ...prev, notes: e.target.value }))}
+                          className="w-full bg-stone-50 border border-amber-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-3 rounded-full bg-chai-800 hover:bg-chai-900 text-white font-bold text-xs shadow-lg active:scale-95 transition-all mt-4"
+                      >
+                        Confirm Table Reservation Free
+                      </button>
+                    </form>
+                  </div>
+                )}
+
+              </div>
+            </div>
+          )}
+
+          {/* ======================================================== */}
+          {/* MODAL 3: DIGITAL KOT (KITCHEN ORDER TICKET) RECEIPT */}
+          {/* ======================================================== */}
+          {isCheckoutReceiptOpen && latestOrder && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/75 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-amber-200 relative">
+                
+                <button
+                  onClick={() => setIsCheckoutReceiptOpen(false)}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-amber-100 hover:bg-amber-200 text-stone-800 flex items-center justify-center font-bold text-xs"
+                >
+                  ✕
+                </button>
+
+                {/* Receipt Card Style */}
+                <div className="text-center pb-4 border-b border-dashed border-stone-300">
+                  <div className="w-12 h-12 mx-auto rounded-full bg-emerald-100 text-emerald-600 text-2xl flex items-center justify-center mb-2">
+                    ✓
+                  </div>
+                  <h3 className="font-serif text-xl font-bold text-chai-950">Chai & Chaska KOT Receipt</h3>
+                  <p className="text-[11px] text-stone-500">Order ID: <strong className="text-stone-800">{latestOrder.orderId}</strong></p>
+                  <p className="text-[10px] text-stone-400">{latestOrder.timestamp} · Dine-in / Express Kiosk</p>
+                </div>
+
+                <div className="py-4 space-y-2 text-xs border-b border-dashed border-stone-300">
+                  <div className="font-bold text-stone-700 text-[11px] uppercase tracking-wider mb-2">Order Items:</div>
+                  {latestOrder.items.map(item => (
+                    <div key={item.id} className="flex justify-between items-center text-stone-700">
+                      <span>{item.quantity}x {item.name}</span>
+                      <span className="font-bold">₹{item.price * item.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Totals */}
+                <div className="py-4 space-y-1.5 text-xs text-stone-600 border-b border-dashed border-stone-300">
+                  <div className="flex justify-between">
+                    <span>Subtotal:</span>
+                    <span>₹{latestOrder.subtotal}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>GST (5%):</span>
+                    <span>₹{latestOrder.gst}</span>
+                  </div>
+                  {latestOrder.discountAmount > 0 && (
+                    <div className="flex justify-between text-emerald-600 font-bold">
+                      <span>Voucher Discount:</span>
+                      <span>-₹{latestOrder.discountAmount}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm font-black text-chai-950 pt-1">
+                    <span>Total Paid (INR):</span>
+                    <span className="text-terracotta-600">₹{latestOrder.grandTotal}</span>
+                  </div>
+                </div>
+
+                <div className="pt-4 text-center space-y-3">
+                  <p className="text-[11px] text-stone-500">
+                    Your chai & snacks are being prepared freshly in the kitchen! 🫖
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        window.print();
+                      }}
+                      className="flex-1 py-2.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-xs"
+                    >
+                      🖨️ Print Receipt
+                    </button>
+                    <button
+                      onClick={() => setIsCheckoutReceiptOpen(false)}
+                      className="flex-1 py-2.5 rounded-full bg-chai-800 hover:bg-chai-900 text-white font-bold text-xs"
+                    >
+                      Close & Enjoy
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* ======================================================== */}
+          {/* MODAL 4: AWS DEVOPS ARCHITECTURE MODAL */}
+          {/* ======================================================== */}
+          {isAwsModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-sm">
+              <div className="bg-stone-900 rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-amber-500/40 text-amber-100 relative">
+                
+                <button
+                  id="close-aws-modal-btn"
+                  onClick={() => setIsAwsModalOpen(false)}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-800 hover:bg-stone-700 text-amber-200 flex items-center justify-center font-bold text-xs"
+                >
+                  ✕
+                </button>
+
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">☁️</span>
+                  <div>
+                    <h3 className="font-serif text-xl font-bold text-white">AWS DevOps Cloud Architecture</h3>
+                    <p className="text-xs text-amber-400">Engineered by M Boobeshwaran · Aspiring AWS DevOps Engineer</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 text-xs text-stone-300">
+                  <div className="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-2">
+                    <h4 className="font-bold text-amber-300 text-sm">Deployment & Infrastructure Pipeline:</h4>
+                    <ul className="list-disc list-inside space-y-1 text-[11px] text-stone-400">
+                      <li><strong>AWS S3 Bucket:</strong> Static website hosting with versioning and encryption enabled.</li>
+                      <li><strong>AWS CloudFront CDN:</strong> Global edge caching with SSL/TLS certificate via AWS ACM.</li>
+                      <li><strong>Route 53:</strong> Low-latency DNS routing with geo-proximity support.</li>
+                      <li><strong>GitHub Actions CI/CD:</strong> Automated testing, linting, and automatic S3 sync on git push.</li>
+                      <li><strong>Zero Package Bloat:</strong> Runs 100% self-contained without requiring node package downloads on target machines!</li>
+                    </ul>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-center">
+                    <div className="p-3 rounded-xl bg-stone-800/80 border border-stone-700">
+                      <span className="text-lg font-black text-emerald-400">99.99%</span>
+                      <span className="text-[10px] block text-stone-400">SLA Availability</span>
+                    </div>
+                    <div className="p-3 rounded-xl bg-stone-800/80 border border-stone-700">
+                      <span className="text-lg font-black text-amber-400">&lt; 150ms</span>
+                      <span className="text-[10px] block text-stone-400">Global Edge Latency</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-center font-medium">
+                    "Crafted with clean code, scalable architecture, and genuine passion for cloud operations."
+                  </div>
+                </div>
+
+                <div className="mt-6 text-center">
+                  <button
+                    onClick={() => setIsAwsModalOpen(false)}
+                    className="px-6 py-2.5 rounded-full bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs"
+                  >
+                    Close Architecture Details
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+        </div>
+      );
+    }
+
+    // Render React App to Root
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
