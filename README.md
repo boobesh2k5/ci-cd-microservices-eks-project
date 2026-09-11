@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 CI/CD Pipeline Automation for Cafe Web Application
+# 🚀 CI/CD Pipeline Automation for Microservices Application using Jenkins and AWS EKS
 
 ### Jenkins • Docker • AWS ECR • AWS EKS • Kubernetes • Argo CD • Trivy • SonarQube
 
